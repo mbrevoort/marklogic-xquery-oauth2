@@ -32,11 +32,9 @@ return
                 let $provider_user_data := oauth2:getUserProfileInfo($provider, $oauth_token_data)
                 return 
                     if($provider_user_data) then
-                        let $user_id := $provider_user_data/id/text()
-                        
+                        let $user_id := $provider_user_data/id/text()                       
                         let $markLogicUsername := oauth2:getOrCreateUserByProvider($provider, $user_id, $provider_user_data) 
                         let $authResult := oauth2:loginAsMarkLogicUser($markLogicUsername)
-                        
                         let $referer := xdmp:get-request-header("Referer")
                         return 
 
@@ -49,7 +47,6 @@ return
                                 xdmp:redirect-response("/")
                     else
                         "Could not get user information"
-                        (: TODO create ML user on the fly :)
             else
                 (: if there's a problem just pass along the error :)
                 xdmp:set-response-code($access_token_response[1]/xdmphttp:code/text(),

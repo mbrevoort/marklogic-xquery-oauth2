@@ -4,6 +4,12 @@ declare namespace xdmphttp="xdmp:http";
 import module namespace sec="http://marklogic.com/xdmp/security" at "/MarkLogic/security.xqy";
 import module namespace security-util = "security-util" at "/lib/security-util.xqy";
 
+(:~
+ : Fetch the user profile info for the given provider, basically a router function
+ : @param $provider the provider name corresponding the provider config setup
+ : @param $oauth_token_data the oauth2 access_token for the current users session
+ : @return the provider-data node() block
+ :)
 declare function oauth2:getUserProfileInfo($provider, $oauth_token_data)  {
     let $access_token := map:get($oauth_token_data, "access_token")    
     return
@@ -111,10 +117,19 @@ declare function oauth2:getOrCreateUserByProvider($providerName as xs:string,
                 $username
 };
 
+(:~
+ : Map a MarkLogic user to an auth provider. Create the provider data block
+ : with details about the user from the auth provider
+ : @param $markLogicUsername the username of the MarkLogic database user in the security database
+ : @param $providerName the provider name corresponding to the provider config
+ : @param $providerUserId the unique user id from the provider
+ : @param $providerUserData node() block representing the user profile data from the provider
+ : 
+ :)
 declare function oauth2:mapUserToAuthProvider($markLogicUsername as xs:string, 
-                                                  $providerName as xs:string, 
-                                                  $providerUserId as xs:string,
-                                                  $providerUserData as node()) 
+                                              $providerName as xs:string, 
+                                              $providerUserId as xs:string,
+                                              $providerUserData as node()) 
 {
     let $pathToUserDetail := fn:concat("/users/", $markLogicUsername, ".xml")
     let $userDetail := xdmp:unpath($pathToUserDetail)/user
